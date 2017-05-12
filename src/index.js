@@ -1,7 +1,8 @@
 // import 'promise-polyfill';
 // import 'isomorphic-fetch';
 import { h, render } from 'preact';
-import './style';
+import './style'; // index.less
+import './style/gutenberg.css'; // Gutenberg print styles
 
 let root;
 function init() {

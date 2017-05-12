@@ -20,3 +20,10 @@ html, body {
 #app {
 	height: 100%;
 }
+
+// Fix Chrome bug where first letter of title is pushed down when printing
+h1, h2, h3, h4, h5 {
+	&:first-letter {
+		margin-top: 0;
+	}
+}
