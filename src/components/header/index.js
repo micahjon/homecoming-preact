@@ -1,19 +1,18 @@
 import { h, Component } from 'preact';
 import { Link } from 'preact-router';
+import { publicPath } from '../../lib/public-path';
 import style from './style.less';
 
 export default class Header extends Component {
 	render({sheetsReady}, state) {
 		return (
 			<header class={style.header + ' no-print'}>
-				<h1>Homecoming</h1>
+				<h1>Homecoming Reports</h1>
 				<nav>
-					<Link href="/">Home</Link>
-					<Link href="/events">Events</Link>
-					<Link href="/individuals">Individuals</Link>
-					<Link href="/profile">Me</Link>
-					<Link href="/profile/john">John</Link>
-					<Link href="/sheets">
+					<Link href={`${publicPath}events/`}>Events</Link>
+					<Link href={`${publicPath}individuals/`}>Individuals</Link>
+					<Link href={publicPath}>About</Link>
+					<Link href={`${publicPath}sheets/`}>
 						<svg
 							class={`${style.header__spreadsheet} ${style['header__spreadsheet--' + (sheetsReady ? 'ok' : 'warning')]}`}
 							viewBox="0 0 48 48"

@@ -88,6 +88,7 @@
     "webpack-dev-server": "^2.4.4"
   },
   "dependencies": {
+    "formbase": "^6.0.0",
     "gutenberg-css": "^0.4.2",
     "preact": "^8.1.0",
     "preact-compat": "^3.15.0",
@@ -95,6 +96,7 @@
     "preact-router": "^2.5.1",
     "promise-polyfill": "^6.0.2",
     "proptypes": "^1.0.0",
+    "purecss": "^0.6.2",
     "serve": "^5.1.4"
   },
   "main": "webpack.config.babel.js",

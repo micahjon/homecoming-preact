@@ -38,34 +38,34 @@ export default class Individuals extends Component {
 				<h1>Individuals</h1>
 				{registrations
 					.map(reg => {
-						const name = `${reg['First Name']} ${reg['Last Name']}`;
-						const spouse = reg['Spouse Last Name'] ? `Spouse: ${reg['Spouse First Name']} ${reg['Spouse Last Name']}` : ``;
+						const name = `${reg.firstname} ${reg.lastname}`;
+						const spouse = reg.spouselastname ? `Spouse: ${reg.spousefirstname} ${reg.spouselastname}` : ``;
 						return (
 							<section class="page-break-before">
-								<h2>{name} ({reg['Type']})</h2>
+								<h2>{name} ({reg.type})</h2>
 								<p>{spouse}</p>
-								<p>Id: {reg['Id'] || '(none)'}</p>
-								<p>Phone: {reg['Phone']}</p>
-								<p>Email: {reg['Email']}</p>
-								<h3>Events</h3>
-								<table class={style.events__table}>
-								<tr>
+								<p>Id: {reg.id || '(none)'}</p>
+								<p>Phone: {reg.phone}</p>
+								<p>Email: {reg.email}</p>
+								<table class={`${style.events__table} pure-table pure-table-horizontal pure-table-striped`} >
+								<thead>
 									<th>Event</th>
 									<th>Qty</th>
 									<th>Cost</th>
 									<th>Subtotal</th>
-								</tr>
+									<th>Day</th>
+								</thead>
 								{ events
-									.filter(event => {return reg[event]})
+									.filter(event => {return reg[event.slug]})
 									.map(event => {return (
 										<tr>
-											<td>{event}</td>
-											<td>{reg[event]}</td>
-											<td>{reg[event]}</td>
-											<td>{reg['Dietary Restrictions']}</td>
+											<td>{event.name}</td>
+											<td>{reg[event.slug]}</td>
+											<td>{event.cost ? `$${event.cost}` : ` - `}</td>
+											<td>{event.cost ? `$${reg[event.slug] * event.cost}` : `$0`}</td>
+											<td>{event.day}</td>
 										</tr>
 										)})
-
 								}
 								</table>
 							</section>

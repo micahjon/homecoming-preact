@@ -9,6 +9,7 @@ import path from 'path';
 const ENV = process.env.NODE_ENV || 'development';
 
 const CSS_MAPS = ENV!=='production';
+const publicPath = ENV === 'production' ? '/homecoming-reports/' : '/';
 
 module.exports = {
 	context: path.resolve(__dirname, "src"),
@@ -16,7 +17,7 @@ module.exports = {
 
 	output: {
 		path: path.resolve(__dirname, "build"),
-		publicPath: '/',
+		publicPath: publicPath,
 		filename: 'bundle.js'
 	},
 
@@ -184,7 +185,7 @@ module.exports = {
 					requestTypes: ['navigate']
 				}
 			],
-			publicPath: '/'
+			publicPath: publicPath
 		})
 	] : []),
 

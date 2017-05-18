@@ -6,6 +6,14 @@
 	width: 100%;
 }
 
+.events__title:before {
+  content: "";
+  display: block;
+  width: 0;
+  height: 66px; /* fixed header height*/
+  margin: -66px 0 0; /* negative fixed header height */
+}
+
 @media print {
 	.events {
 		padding: 0;

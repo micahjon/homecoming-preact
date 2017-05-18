@@ -6,60 +6,89 @@
  *
  * Inspired by this Gist: https://gist.github.com/gf3/132080 
  */
-const fetchSpreadsheet = (unique => (id, query) =>
-	new Promise(rs => {
+const fetchSpreadsheet = (unique => (spreadsheetId, worksheetId, query) => {
+	return new Promise((resolve, reject) => {
 		const script = document.createElement('script');
 		const name = `_jsonp_${unique++}`;
 
-		let url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=responseHandler:${name}`;
+		// Default worksheet is the first one (id = 0)
+		worksheetId = worksheetId || 0;
+
+		let url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?gid=${worksheetId}&tqx=responseHandler:${name}`;
 
 		if (typeof query === 'string' && query.length) {
 			url += `&tq=${query}`;
 		}
 
 		script.src = url;
+
+		script.onerror = reason => resolve(reason);
+
 		window[name] = json => {
-			rs(new Response(JSON.stringify(json)));
+			resolve(new Response(JSON.stringify(json)));
 			script.remove();
 			delete window[name];
 		};
 
 		document.body.appendChild(script);
-	}))(0);
+	});
+})(0);
 
-const getRowObjects = (id, query) => {
-	return fetchSpreadsheet(id)
-		.then(function(response) {
-			return response.json();
-		})
-		// Transform rows & columns into objects { col_name: "row value", ... }
-		.then(function(json) {
-			const { cols } = json.table;
-			const rows = json.table.rows.map(row => row.c);
-			let objects = [];
+const getRowObjects = (spreadsheetId, worksheetId, query) => {
+	return (
+		fetchSpreadsheet(spreadsheetId, worksheetId, query)
+			.then(function(response) {
+				if ( response.type !== 'error' ) {
+					return response.json();
+				}
+				else {
+					throw `Spreadsheet data could not be fetched`;
+				}
 
-			rows.forEach((row, rowIndex) => {
-				let obj = {};
-				row.forEach((value, colIndex) => {
-					if (value && value.v) {
-						obj[ cols[colIndex].label ] = value.v;
-					}
-				})
-				objects.push(obj);
 			})
+			// Transform rows & columns into objects { col_name: "row value", ... }
+			.then(function(json) {
+				const { cols } = json.table;
+				const rows = json.table.rows.map(row => row.c);
+				let objects = [];
 
-			return { columns: cols, rows: rows, rowObjects: objects };
-		})
-		.catch(function(err) {
-			alert(
-				'Sorry, an error occurred while trying to fetch Google Spreadsheet\n' +
-					err
-			);
-			console.error('Unable to get spreadsheet data', err);
-		});
+				rows.forEach((row, rowIndex) => {
+					let obj = {};
+					row.forEach((value, colIndex) => {
+						if (value && value.v) {
+							obj[cols[colIndex].label.toLowerCase().replace(/[^a-zA-Z0-9_]/g, '')] = value.v;
+						}
+					});
+					objects.push(obj);
+				});
+
+				return { columns: cols, rows: rows, rowObjects: objects };
+			})
+			.catch(function(err) {
+				return { error: err }
+			})
+	);
+};
+
+const getSpreadsheetIdFromUrl = url => {
+	const matches = url.match(/\/d\/([a-zA-Z0-9-_]+)\//);
+	if (matches && matches[1]) {
+		return matches[1];
+	}
+	return false;
+};
+
+const getWorksheetIdFromUrl = url => {
+	const matches = url.match(/gid=([0-9]+)/);
+	if (matches && matches[1]) {
+		return matches[1];
+	}
+	return false;
 };
 
 module.exports = {
 	fetch: fetchSpreadsheet,
 	getRowObjects: getRowObjects,
+	getSpreadsheetIdFromUrl: getSpreadsheetIdFromUrl,
+	getWorksheetIdFromUrl: getWorksheetIdFromUrl,
 };
