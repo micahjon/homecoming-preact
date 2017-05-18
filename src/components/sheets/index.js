@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import style from './style.less';
 import googleSpreadsheet from '../../lib/google-spreadsheet';
+import Clipboard from 'clipboard';
 
 /**
  * This class takes care of fetching the data from Google Spreadsheets
@@ -18,6 +19,33 @@ export default class Sheets extends Component {
 
 		this.props = initialProps;
 
+		// Initial values for spreadsheet urls
+		let sheetUrls = {
+			registrations: null,
+			events: null,
+		};
+		let validHash = false;
+
+		// Attempt to get spreadsheet urls from a hash in a "shareable" url
+		if (window.location.hash.startsWith('#share=')) {
+			let base64 = window.location.hash.substring(7);
+			try {
+				sheetUrls = JSON.parse(window.atob(base64));
+				validHash = true;
+				console.log('Got spreadsheet urls from #share= hash!');
+			} catch (e) {
+				console.error('Invalid #share= hash in url:\n', e);
+			}
+		}
+		if (!validHash) {
+			// Attempt to get spreadsheet urls from LocalStorage
+			for (let sheetName in sheetUrls) {
+				sheetUrls[sheetName] = localStorage.getItem(
+					`spreadsheet-${sheetName}`
+				);
+			}
+		}
+
 		this.state = {
 			// Spreadsheet-related data
 			sheets: {
@@ -26,16 +54,14 @@ export default class Sheets extends Component {
 					status: '',
 					spreadsheetId: null,
 					worksheetId: null,
-					spreadsheetUrl: localStorage.getItem(
-						'spreadsheet-registrations'
-					),
+					spreadsheetUrl: sheetUrls['registrations'],
 				},
 				events: {
 					ready: false,
 					status: '',
 					spreadsheetId: null,
 					worksheetId: null,
-					spreadsheetUrl: localStorage.getItem('spreadsheet-events'),
+					spreadsheetUrl: sheetUrls['events'],
 				},
 			},
 		};
@@ -192,15 +218,37 @@ export default class Sheets extends Component {
 			});
 	};
 
+	/**
+	 * Generate a sharing link that contains both spreadsheet urls
+	 * base64 encoded, e.g.
+	 * /homecoming-reports/#share={base64 encoded JSON with urls} 
+	 * @return {String} Sharing url
+	 */
+	getSharingLink = () => {
+		const url = window.location.href.split('#')[0].replace('sheets/', '');
+		const sheets = this.state.sheets;
+		const hash = '#share=' + btoa(JSON.stringify({
+			registrations: sheets.registrations.spreadsheetUrl,
+			events: sheets.events.spreadsheetUrl,
+		}));
+
+		return url + hash;
+	}
+
 	// gets called when this route is navigated to
-	componentDidMount() {}
+	componentDidMount() {
+		this.clipboardButton = new Clipboard('.copy-to-clipboard');
+	}
 
 	// gets called just before navigating away from the route
-	componentWillUnmount() {}
+	componentWillUnmount() {
+		if (this.clipboardButton) this.clipboardButton.destroy();
+	}
 
 	// Note: `user` comes from the URL, courtesy of our router
 	render({}, state) {
 		const sheets = state.sheets;
+		const sharingLink = (sheets.events.ready && sheets.registrations.ready) ? this.getSharingLink() : false;
 
 		return (
 			<div class={style.sheets}>
@@ -208,76 +256,97 @@ export default class Sheets extends Component {
 				<p>
 					This app depends on data from 2 worksheets in a Google Spreadsheet. Open these sheets in your browser and copy the urls into the fields below:
 				</p>
-				<div>
-					<h2>Registrations</h2>
-					<p
-						class={style.sheets__status}
-						style={`color: ${!sheets.registrations.spreadsheetUrl ? 'black' : sheets.registrations.ready ? 'green' : 'red'}`}
+				<h2>Registrations</h2>
+				<p
+					class={style.sheets__status}
+					style={`color: ${!sheets.registrations.spreadsheetUrl ? 'black' : sheets.registrations.ready ? 'green' : 'red'}`}
+				>
+					{sheets.registrations.status}
+				</p>
+				<form
+					class="pure-form"
+					onSubmit={e => {
+						e.preventDefault();
+						this.parseUrl(
+							e.target.firstElementChild.value,
+							'registrations'
+						);
+					}}
+				>
+					<input
+						class={style.sheets__input}
+						type="url"
+						placeholder="Worksheet Url"
+						value={sheets.registrations.spreadsheetUrl}
+					/>
+					<button
+						class={
+							style.sheets__button +
+								' pure-button pure-button-primary'
+						}
+						type="submit"
 					>
-						{sheets.registrations.status}
-					</p>
-					<form
-						class="pure-form"
-						onSubmit={e => {
-							e.preventDefault();
-							this.parseUrl(
-								e.target.firstElementChild.value,
-								'registrations'
-							);
-						}}
+						Save
+					</button>
+				</form>
+				<h2>Events</h2>
+				<p
+					class={style.sheets__status}
+					style={`color: ${!sheets.events.spreadsheetUrl ? 'black' : sheets.events.ready ? 'green' : 'red'}`}
+				>
+					{sheets.events.status}
+				</p>
+				<form
+					class="pure-form"
+					onSubmit={e => {
+						e.preventDefault();
+						this.parseUrl(
+							e.target.firstElementChild.value,
+							'events'
+						);
+					}}
+				>
+					<input
+						class={style.sheets__input}
+						type="url"
+						placeholder="Worksheet Url"
+						value={sheets.events.spreadsheetUrl}
+					/>
+					<button
+						class={
+							style.sheets__button +
+								' pure-button pure-button-primary'
+						}
+						type="submit"
 					>
-						<input
-							class={style.sheets__input}
-							type="url"
-							placeholder="Worksheet Url"
-							value={sheets.registrations.spreadsheetUrl}
-						/>
-						<button
-							class={
-								style.sheets__button +
-									' pure-button pure-button-primary'
-							}
-							type="submit"
-						>
-							Save
-						</button>
-					</form>
-				</div>
-				<div>
-					<h2>Events</h2>
-					<p
-						class={style.sheets__status}
-						style={`color: ${!sheets.events.spreadsheetUrl ? 'black' : sheets.events.ready ? 'green' : 'red'}`}
-					>
-						{sheets.events.status}
-					</p>
-					<form
-						class="pure-form"
-						onSubmit={e => {
-							e.preventDefault();
-							this.parseUrl(
-								e.target.firstElementChild.value,
-								'events'
-							);
-						}}
-					>
-						<input
-							class={style.sheets__input}
-							type="url"
-							placeholder="Worksheet Url"
-							value={sheets.events.spreadsheetUrl}
-						/>
-						<button
-							class={
-								style.sheets__button +
-									' pure-button pure-button-primary'
-							}
-							type="submit"
-						>
-							Save
-						</button>
-					</form>
-				</div>
+						Save
+					</button>
+				</form>
+				{
+					sharingLink &&
+					<div>
+						<br />
+						<h2>Sharing link</h2>
+						<form class="pure-form">
+							<textarea
+								class={`${style.sheets__sharelink} pure-input`}
+								rows="7"
+								cols="50"
+							>
+							{sharingLink}
+							</textarea>
+							<button
+								class="pure-button pure-button-primary copy-to-clipboard"
+								style="display: block; margin-top: 1%"
+								data-clipboard-target={`.${style.sheets__sharelink}`}
+								type="button"
+							>
+								Copy to Clipboard
+							</button>
+						</form>
+					</div>
+					
+				}
 				<br />
 				<br />
 				<hr />
