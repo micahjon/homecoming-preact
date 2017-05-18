@@ -4,14 +4,14 @@ import { publicPath } from '../../lib/public-path';
 import style from './style.less';
 
 export default class Header extends Component {
-	render({sheetsReady}, state) {
+	render({ sheetsReady }, state) {
 		return (
 			<header class={style.header + ' no-print'}>
 				<h1>Homecoming Reports</h1>
 				<nav>
+					<Link href={publicPath}>Home</Link>
 					<Link href={`${publicPath}events/`}>Events</Link>
 					<Link href={`${publicPath}individuals/`}>Individuals</Link>
-					<Link href={publicPath}>About</Link>
 					<Link href={`${publicPath}sheets/`}>
 						<svg
 							class={`${style.header__spreadsheet} ${style['header__spreadsheet--' + (sheetsReady ? 'ok' : 'warning')]}`}

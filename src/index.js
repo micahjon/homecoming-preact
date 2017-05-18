@@ -1,10 +1,9 @@
 // import 'promise-polyfill';
 // import 'isomorphic-fetch';
 import { h, render } from 'preact';
-import '../node_modules/purecss/build/tables.css'; // Pure table styles CSS
+import '../node_modules/purecss/build/pure.css'; // Pure table styles & buttons CSS
 import './style'; // index.less
 import './style/gutenberg.css'; // Gutenberg print styles
-import './style/formbase.css'; // Form styles
 
 let root;
 function init() {

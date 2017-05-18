@@ -2,7 +2,6 @@ import { h, Component } from 'preact';
 import style from './style.less';
 
 export default class Events extends Component {
-
 	// gets called when this route is navigated to
 	componentDidMount() {}
 
@@ -24,22 +23,40 @@ export default class Events extends Component {
 	};
 
 	render({ registrations, events }) {
-		// console.log(registrations, events);
-
 		const attendance = this.getAttendance(registrations, events);
 
 		return (
 			<div class={style.events}>
 				<h1>Events</h1>
-				<ul>
-					{events.map(({ name, slug }) => (
-						<li><a href={`#${slug}`}>{name} - {attendance[slug]}</a></li>
+				<table
+					class={`${style.events__table} pure-table pure-table-horizontal pure-table-striped`}
+				>
+					<thead>
+						<th>Event Name</th>
+						<th>Location</th>
+						<th>Attendance</th>
+					</thead>
+					{events.map(({ name, location, slug }) => (
+						<tr>
+							<td>
+								<a
+									class={style.events__anchor}
+									href={`#${slug}`}
+								>
+									{name}
+								</a>
+							</td>
+							<td>{location}</td>
+							<td>{attendance[slug]}</td>
+						</tr>
 					))}
-				</ul>
+				</table>
 				{events.map(event => {
 					return (
 						<div id={`${event.slug}`}>
-							<h2 class={`${style.events__title} page-break-before`}>
+							<h2
+								class={`${style.events__title} page-break-before`}
+							>
 								{event.name} ({attendance[event.slug]})
 							</h2>
 							<table
@@ -57,16 +74,14 @@ export default class Events extends Component {
 										return reg[event.slug];
 									})
 									.map(reg => {
-										const name =
-											reg.lastname + ', ' + reg.firstname;
 										const spouseName = reg.spouselastname
-											? reg.spouselastname +
-													', ' +
-													reg.spousefirstname
-											: '';
+											? `${reg.spouselastname}, ${reg.spousefirstname}`
+											: ``;
 										return (
 											<tr>
-												<td>{name}</td>
+												<td>
+													{`${reg.lastname}, ${reg.firstname}`}
+												</td>
 												<td>{spouseName}</td>
 												<td>{reg.id}</td>
 												<td>{reg[event.slug]}</td>

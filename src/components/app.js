@@ -8,7 +8,6 @@ import Events from './events';
 import Individuals from './individuals';
 import Sheets from './sheets';
 
-
 export default class App extends Component {
 	state = {
 		// Are the spreadsheets working?
@@ -24,7 +23,10 @@ export default class App extends Component {
 	 */
 	handleVisibilityChange = () => {
 		// Refresh model
-		if (!document.hidden && this.checkForUpdates) this.checkForUpdates();
+		if (!document.hidden) {
+			if (this.checkForUpdates) this.checkForUpdates();
+			else console.log('this.checkForUpdates is not available');
+		}
 	};
 
 	componentDidMount() {
@@ -32,6 +34,7 @@ export default class App extends Component {
 		if (!this.state.events.length || !this.state.registrations.length) {
 			if (Router.getCurrentUrl() !== publicPath + 'sheets/') {
 				// Manually initialize /sheets/ component to fetch model the first time
+				console.log('Manually instantiating Sheets');
 				new Sheets({
 					allowAppToTriggerUpdates: updateFunction => {
 						this.checkForUpdates = updateFunction;
@@ -72,7 +75,6 @@ export default class App extends Component {
 				<Router onChange={this.handleRoute}>
 					<Home
 						path={publicPath}
-						getSpreadsheetId={this.getSpreadsheetId}
 						registrations={state.registrations}
 						events={state.events}
 					/>

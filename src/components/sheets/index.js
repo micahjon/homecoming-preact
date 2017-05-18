@@ -40,6 +40,9 @@ export default class Sheets extends Component {
 			},
 		};
 
+		// Allow App to trigger updates
+		this.props.allowAppToTriggerUpdates(this.checkForUpdates);
+
 		// Parse urls
 		this.parseUrl(this.state.sheets.events.spreadsheetUrl, 'events');
 		this.parseUrl(
@@ -164,9 +167,11 @@ export default class Sheets extends Component {
 
 				// Add slug to event objects (e.g. {Name = 'Event A', slug = 'eventa'})
 				// which matches property on registration objects (e.g. { eventa: 2 })
-				events = events.map(event => 
+				events = events.map(event =>
 					Object.assign(event, {
-						slug: event.name.toLowerCase().replace(/[^a-zA-Z0-9_]/g, '')
+						slug: event.name
+							.toLowerCase()
+							.replace(/[^a-zA-Z0-9_]/g, ''),
 					})
 				);
 
@@ -188,10 +193,7 @@ export default class Sheets extends Component {
 	};
 
 	// gets called when this route is navigated to
-	componentDidMount() {
-		// Allow App to trigger updates
-		this.props.allowAppToTriggerUpdates(this.checkForUpdates);
-	}
+	componentDidMount() {}
 
 	// gets called just before navigating away from the route
 	componentWillUnmount() {}
@@ -208,10 +210,14 @@ export default class Sheets extends Component {
 				</p>
 				<div>
 					<h2>Registrations</h2>
-					<p class={style.sheets__status} style={`color: ${ !sheets.registrations.spreadsheetUrl ? 'black' : (sheets.registrations.ready ? 'green' : 'red')}`}>
+					<p
+						class={style.sheets__status}
+						style={`color: ${!sheets.registrations.spreadsheetUrl ? 'black' : sheets.registrations.ready ? 'green' : 'red'}`}
+					>
 						{sheets.registrations.status}
 					</p>
 					<form
+						class="pure-form"
 						onSubmit={e => {
 							e.preventDefault();
 							this.parseUrl(
@@ -221,20 +227,32 @@ export default class Sheets extends Component {
 						}}
 					>
 						<input
-							class={style.sheets__input + ' input'}
+							class={style.sheets__input}
 							type="url"
 							placeholder="Worksheet Url"
 							value={sheets.registrations.spreadsheetUrl}
 						/>
-						<button class={style.sheets__button} type="submit">
+						<button
+							class={
+								style.sheets__button +
+									' pure-button pure-button-primary'
+							}
+							type="submit"
+						>
 							Save
 						</button>
 					</form>
 				</div>
 				<div>
 					<h2>Events</h2>
-					<p class={style.sheets__status} style={`color: ${ !sheets.events.spreadsheetUrl ? 'black' : (sheets.events.ready ? 'green' : 'red')}`}>{sheets.events.status}</p>
+					<p
+						class={style.sheets__status}
+						style={`color: ${!sheets.events.spreadsheetUrl ? 'black' : sheets.events.ready ? 'green' : 'red'}`}
+					>
+						{sheets.events.status}
+					</p>
 					<form
+						class="pure-form"
 						onSubmit={e => {
 							e.preventDefault();
 							this.parseUrl(
@@ -244,12 +262,18 @@ export default class Sheets extends Component {
 						}}
 					>
 						<input
-							class={style.sheets__input + ' input'}
+							class={style.sheets__input}
 							type="url"
 							placeholder="Worksheet Url"
 							value={sheets.events.spreadsheetUrl}
 						/>
-						<button class={style.sheets__button} type="submit">
+						<button
+							class={
+								style.sheets__button +
+									' pure-button pure-button-primary'
+							}
+							type="submit"
+						>
 							Save
 						</button>
 					</form>
