@@ -40,9 +40,7 @@ export default class Sheets extends Component {
 		if (!validHash) {
 			// Attempt to get spreadsheet urls from LocalStorage
 			for (let sheetName in sheetUrls) {
-				sheetUrls[sheetName] = localStorage.getItem(
-					`spreadsheet-${sheetName}`
-				);
+				sheetUrls[sheetName] = localStorage.getItem(`spreadsheet-${sheetName}`);
 			}
 		}
 
@@ -71,10 +69,7 @@ export default class Sheets extends Component {
 
 		// Parse urls
 		this.parseUrl(this.state.sheets.events.spreadsheetUrl, 'events');
-		this.parseUrl(
-			this.state.sheets.registrations.spreadsheetUrl,
-			'registrations'
-		);
+		this.parseUrl(this.state.sheets.registrations.spreadsheetUrl, 'registrations');
 	}
 
 	/**
@@ -119,10 +114,7 @@ export default class Sheets extends Component {
 	 */
 	updateSheet = (sheetName, sheetData) => {
 		let newSheetsState = Object.assign({}, this.state.sheets);
-		newSheetsState[sheetName] = Object.assign(
-			newSheetsState[sheetName],
-			sheetData
-		);
+		newSheetsState[sheetName] = Object.assign(newSheetsState[sheetName], sheetData);
 		this.setState({
 			sheets: newSheetsState,
 		});
@@ -156,10 +148,7 @@ export default class Sheets extends Component {
 				registrationsSheet.spreadsheetId,
 				registrationsSheet.worksheetId
 			),
-			googleSpreadsheet.getRowObjects(
-				eventsSheet.spreadsheetId,
-				eventsSheet.worksheetId
-			),
+			googleSpreadsheet.getRowObjects(eventsSheet.spreadsheetId, eventsSheet.worksheetId),
 		])
 			.then(([registrationData, eventData]) => {
 				const registrations = registrationData.rowObjects
@@ -195,26 +184,34 @@ export default class Sheets extends Component {
 				// which matches property on registration objects (e.g. { eventa: 2 })
 				events = events.map(event =>
 					Object.assign(event, {
-						slug: event.name
-							.toLowerCase()
-							.replace(/[^a-zA-Z0-9_]/g, ''),
+						slug: event.name.toLowerCase().replace(/[^a-zA-Z0-9_]/g, ''),
 					})
 				);
 
 				// console.log('events, registrations', events ,registrations);
 
+				console.log(registrations);
+
 				// Update the app's model with the new data
 				this.props.updateAppModel({
-					registrations: registrations,
+					// Sort registrations by lastname, then by firstname
+					registrations: registrations.sort((a, b) => {
+						// Remove any names in parenthesis, e.g. Jane (Maiden) Miller
+						const lastnameA = a.lastname.replace(/\(.+\)/, '').trim().toLowerCase();
+						const lastnameB = b.lastname.replace(/\(.+\)/, '').trim().toLowerCase();
+
+						if (lastnameA > lastnameB) return 1;
+						else if (lastnameA < lastnameB) return -1;
+
+						// Lastnames are the same. Compare firstnames
+						return a.firstname.toLowerCase() > b.firstname.toLowerCase() ? 1 : -1;
+					}),
 					events: events,
 					sheetsReady: !!(registrations.length && events.length),
 				});
 			})
 			.catch(err => {
-				console.log(
-					'An error occurred while fetching spreadsheet data',
-					err
-				);
+				console.log('An error occurred while fetching spreadsheet data', err);
 			});
 	};
 
@@ -227,13 +224,17 @@ export default class Sheets extends Component {
 	getSharingLink = () => {
 		const url = window.location.href.split('#')[0].replace('sheets/', '');
 		const sheets = this.state.sheets;
-		const hash = '#share=' + btoa(JSON.stringify({
-			registrations: sheets.registrations.spreadsheetUrl,
-			events: sheets.events.spreadsheetUrl,
-		}));
+		const hash =
+			'#share=' +
+			btoa(
+				JSON.stringify({
+					registrations: sheets.registrations.spreadsheetUrl,
+					events: sheets.events.spreadsheetUrl,
+				})
+			);
 
 		return url + hash;
-	}
+	};
 
 	// gets called when this route is navigated to
 	componentDidMount() {
@@ -248,7 +249,9 @@ export default class Sheets extends Component {
 	// Note: `user` comes from the URL, courtesy of our router
 	render({}, state) {
 		const sheets = state.sheets;
-		const sharingLink = (sheets.events.ready && sheets.registrations.ready) ? this.getSharingLink() : false;
+		const sharingLink = sheets.events.ready && sheets.registrations.ready
+			? this.getSharingLink()
+			: false;
 
 		return (
 			<div class={style.sheets}>
@@ -267,10 +270,7 @@ export default class Sheets extends Component {
 					class="pure-form"
 					onSubmit={e => {
 						e.preventDefault();
-						this.parseUrl(
-							e.target.firstElementChild.value,
-							'registrations'
-						);
+						this.parseUrl(e.target.firstElementChild.value, 'registrations');
 					}}
 				>
 					<input
@@ -280,10 +280,7 @@ export default class Sheets extends Component {
 						value={sheets.registrations.spreadsheetUrl}
 					/>
 					<button
-						class={
-							style.sheets__button +
-								' pure-button pure-button-primary'
-						}
+						class={style.sheets__button + ' pure-button pure-button-primary'}
 						type="submit"
 					>
 						Save
@@ -300,10 +297,7 @@ export default class Sheets extends Component {
 					class="pure-form"
 					onSubmit={e => {
 						e.preventDefault();
-						this.parseUrl(
-							e.target.firstElementChild.value,
-							'events'
-						);
+						this.parseUrl(e.target.firstElementChild.value, 'events');
 					}}
 				>
 					<input
@@ -313,17 +307,13 @@ export default class Sheets extends Component {
 						value={sheets.events.spreadsheetUrl}
 					/>
 					<button
-						class={
-							style.sheets__button +
-								' pure-button pure-button-primary'
-						}
+						class={style.sheets__button + ' pure-button pure-button-primary'}
 						type="submit"
 					>
 						Save
 					</button>
 				</form>
-				{
-					sharingLink &&
+				{sharingLink &&
 					<div>
 						<br />
 						<h2>Sharing link</h2>
@@ -333,7 +323,7 @@ export default class Sheets extends Component {
 								rows="7"
 								cols="50"
 							>
-							{sharingLink}
+								{sharingLink}
 							</textarea>
 							<button
 								class="pure-button pure-button-primary copy-to-clipboard"
@@ -344,9 +334,7 @@ export default class Sheets extends Component {
 								Copy to Clipboard
 							</button>
 						</form>
-					</div>
-					
-				}
+					</div>}
 				<br />
 				<br />
 				<hr />
