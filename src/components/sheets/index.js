@@ -190,8 +190,6 @@ export default class Sheets extends Component {
 
 				// console.log('events, registrations', events ,registrations);
 
-				console.log(registrations);
-
 				// Update the app's model with the new data
 				this.props.updateAppModel({
 					// Sort registrations by lastname, then by firstname
