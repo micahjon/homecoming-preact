@@ -26,7 +26,7 @@ export default class Events extends Component {
 		const attendance = this.getAttendance(registrations, events);
 
 		return (
-			<div class={style.events}>
+			<div id="events" class={style.events}>
 				<h1>Events</h1>
 				<table
 					class={`${style.events__table} pure-table pure-table-horizontal pure-table-striped`}
