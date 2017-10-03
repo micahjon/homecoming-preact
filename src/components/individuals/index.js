@@ -133,7 +133,7 @@ export default class Individuals extends Component {
 									<tr>
 										<td colspan="2" /><td /><td>
 											{(!reg.total && <span>$0</span>) ||
-												((reg.paymentmethod.indexOf('Credit') === 0 ||
+												((reg.paymentmethod && reg.paymentmethod.indexOf('Credit') === 0 ||
 													reg.total <= reg.amountpaid) &&
 													<span>${reg.total} paid in full</span>) ||
 												<strong>
