@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
 import style from './style.less';
+import CopyIds from '../copy-ids';
 
 export default class Events extends Component {
 	// gets called when this route is navigated to
@@ -39,10 +40,7 @@ export default class Events extends Component {
 					{events.map(({ name, location, slug }) => (
 						<tr>
 							<td>
-								<a
-									class={style.events__anchor}
-									href={`#${slug}`}
-								>
+								<a class={style.events__anchor} href={`#${slug}`}>
 									{name}
 								</a>
 							</td>
@@ -54,9 +52,7 @@ export default class Events extends Component {
 				{events.map(event => {
 					return (
 						<div id={`${event.slug}`}>
-							<h2
-								class={`${style.events__title} page-break-before`}
-							>
+							<h2 class={`${style.events__title} page-break-before`}>
 								{event.name} ({attendance[event.slug]})
 							</h2>
 							<table
@@ -79,23 +75,19 @@ export default class Events extends Component {
 											: ``;
 										return (
 											<tr>
-												<td>
-													{`${reg.lastname}, ${reg.firstname}`}
-												</td>
+												<td>{`${reg.lastname}, ${reg.firstname}`}</td>
 												<td>{spouseName}</td>
 												<td>{reg.id}</td>
 												<td>{reg[event.slug]}</td>
-												<td>
-													{reg.dietaryrestrictions}
-												</td>
+												<td>{reg.dietaryrestrictions}</td>
 											</tr>
 										);
 									})}
 							</table>
+							<CopyIds rows="4" registrations={registrations.filter(reg => reg[event.slug])} />
 						</div>
 					);
 				})}
-
 			</div>
 		);
 	}
