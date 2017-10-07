@@ -61,7 +61,6 @@ export default class Events extends Component {
 								<thead>
 									<th>Alum</th>
 									<th>Spouse</th>
-									<th>ID</th>
 									<th>Qty</th>
 									<th>Dietary Restriction</th>
 								</thead>
@@ -75,9 +74,8 @@ export default class Events extends Component {
 											: ``;
 										return (
 											<tr>
-												<td>{`${reg.lastname}, ${reg.firstname}`}</td>
-												<td>{spouseName}</td>
-												<td>{reg.id}</td>
+												<td>{reg.lastname}, {reg.firstname} {reg.id ? `(${reg.id})` : ``}</td>
+												<td>{spouseName} {reg.spouseid ? `(${reg.spouseid})` : ``}</td>
 												<td>{reg[event.slug]}</td>
 												<td>{reg.dietaryrestrictions}</td>
 											</tr>
