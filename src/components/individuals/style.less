@@ -4,12 +4,6 @@
 	width: 100%;
 }
 
-@media print {
-	.individuals {
-		padding: 0;
-	}
-}
-
 .individuals__form label {
 	display: inline-block;
 }
@@ -26,4 +20,31 @@
 	height: 1em;
 	vertical-align: middle;
 	margin: -.25em .5em 0 0;
+}
+
+.inline-radio {
+	margin: 0 1em 0.5em 0 !important;
+}
+
+// Print styles
+@media print {
+	.individuals {
+		padding: 0;
+		overflow: hidden;
+	}
+	.individuals > *:not(section) {
+		display: none;
+	}
+	.individuals > section {
+		margin-bottom: 2.54cm;
+	    margin-left: 1.8cm;
+	    margin-right: 1.8cm;
+	    margin-top: 2.54cm;
+	}
+	body {
+		padding: 0;
+	}
+	// .individuals > section:first-child {
+	// 	page-break-before: avoid;
+	// }
 }

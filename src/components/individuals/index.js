@@ -4,6 +4,7 @@ import style from './style.less';
 export default class Individuals extends Component {
 	state = {
 		selectedType: 'All',
+		nameFilter: '',
 	};
 
 	// gets called when this route is navigated to
@@ -12,12 +13,13 @@ export default class Individuals extends Component {
 	// gets called just before navigating away from the route
 	componentWillUnmount() {}
 
-	render({ registrations, events }, { selectedType }) {
+	render({ registrations, events }, { selectedType, nameFilter }) {
 		return (
 			<div class={style.individuals}>
 				<h1>Individuals</h1>
-				<form class={`${style.individuals__form} pure-form`}>
-					<label for="show-all" class="pure-radio">
+				<h3>Registration Type</h3>
+				<form class={`${style.individuals__form} pure-form`} onSubmit={event => event.preventDefault()}>
+					<label for="show-all" class={style['inline-radio']}>
 						<input
 							id="show-all"
 							type="radio"
@@ -26,7 +28,7 @@ export default class Individuals extends Component {
 						/>
 						All (default)
 					</label>
-					<label for="show-alumni" class="pure-radio">
+					<label for="show-alumni" class={style['inline-radio']}>
 						<input
 							id="show-alumni"
 							type="radio"
@@ -35,7 +37,7 @@ export default class Individuals extends Component {
 						/>
 						Alumni
 					</label>
-					<label for="show-grandparents" class="pure-radio">
+					<label for="show-grandparents" class={style['inline-radio']}>
 						<input
 							id="show-grandparents"
 							type="radio"
@@ -44,7 +46,7 @@ export default class Individuals extends Component {
 						/>
 						Grandparents
 					</label>
-					<label for="show-parents" class="pure-radio">
+					<label for="show-parents" class={style['inline-radio']}>
 						<input
 							id="show-parents"
 							type="radio"
@@ -53,17 +55,24 @@ export default class Individuals extends Component {
 						/>
 						Parents
 					</label>
+					<h3>Filter by Name</h3>
+					<input 
+						type="search" 
+						value={nameFilter}
+						onChange={event => this.setState({ nameFilter: event.target.value })} 
+					/>
 				</form>
 
 				{registrations
 					.filter(reg => selectedType === 'All' || reg.type === selectedType)
-					.map(reg => {
+					.filter(reg => `${reg.firstname} ${reg.lastname}`.toLowerCase().includes(nameFilter.toLowerCase()))
+					.map((reg, index) => {
 						const name = `${reg.firstname} ${reg.lastname}`;
 						const spouse = reg.spouselastname
 							? `Spouse: ${reg.spousefirstname} ${reg.spouselastname}`
 							: ``;
 						return (
-							<section class="page-break-before">
+							<section class={index ? 'page-break-before' : ''}>
 								<h2>{name}</h2>
 								<p>{spouse}</p>
 								<table
