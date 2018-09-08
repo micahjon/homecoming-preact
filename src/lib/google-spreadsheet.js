@@ -2,9 +2,9 @@
  * Fetch Google Spreadsheet data via JSONP
  * @param  {String} id 		Id of Google Spreadsheet
  * @param  {String} query  	Query function (optional) (see https://developers.google.com/chart/interactive/docs/querylanguage)
- * @return {Response}        
+ * @return {Response}
  *
- * Inspired by this Gist: https://gist.github.com/gf3/132080 
+ * Inspired by this Gist: https://gist.github.com/gf3/132080
  */
 const fetchSpreadsheet = (unique => (spreadsheetId, worksheetId, query) => {
 	return new Promise((resolve, reject) => {
@@ -38,13 +38,11 @@ const getRowObjects = (spreadsheetId, worksheetId, query) => {
 	return (
 		fetchSpreadsheet(spreadsheetId, worksheetId, query)
 			.then(function(response) {
-				if ( response.type !== 'error' ) {
+				if (response.type !== 'error') {
 					return response.json();
-				}
-				else {
+				} else {
 					throw `Spreadsheet data could not be fetched`;
 				}
-
 			})
 			// Transform rows & columns into objects { col_name: "row value", ... }
 			.then(function(json) {
@@ -56,16 +54,16 @@ const getRowObjects = (spreadsheetId, worksheetId, query) => {
 					let obj = {};
 					row.forEach((value, colIndex) => {
 						if (value && value.v) {
-							obj[cols[colIndex].label.toLowerCase().replace(/[^a-zA-Z0-9_]/g, '')] = value.v;
+							obj[cols[colIndex].label.toLowerCase().replace(/[^a-zA-Z0-9_]/g, '')] =
+								value.v;
 						}
 					});
 					objects.push(obj);
 				});
-
 				return { columns: cols, rows: rows, rowObjects: objects };
 			})
 			.catch(function(err) {
-				return { error: err }
+				return { error: err };
 			})
 	);
 };

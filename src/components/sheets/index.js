@@ -10,7 +10,7 @@ import Clipboard from 'clipboard';
  */
 export default class Sheets extends Component {
 	/**
-	 * Pass initialProps directly from app.js, where a new instance of Sheets 
+	 * Pass initialProps directly from app.js, where a new instance of Sheets
 	 * is created. Why? This allows me to fetch the model the first time, w/out
 	 * navigating to the /sheets/ route to initialize this component.
 	 */
@@ -152,7 +152,7 @@ export default class Sheets extends Component {
 		])
 			.then(([registrationData, eventData]) => {
 				const registrations = registrationData.rowObjects
-					? registrationData.rowObjects
+					? registrationData.rowObjects.filter(reg => reg.lastname)
 					: [];
 				let events = eventData.rowObjects ? eventData.rowObjects : [];
 
@@ -195,8 +195,14 @@ export default class Sheets extends Component {
 					// Sort registrations by lastname, then by firstname
 					registrations: registrations.sort((a, b) => {
 						// Remove any names in parenthesis, e.g. Jane (Maiden) Miller
-						const lastnameA = a.lastname.replace(/\(.+\)/, '').trim().toLowerCase();
-						const lastnameB = b.lastname.replace(/\(.+\)/, '').trim().toLowerCase();
+						const lastnameA = a.lastname
+							.replace(/\(.+\)/, '')
+							.trim()
+							.toLowerCase();
+						const lastnameB = b.lastname
+							.replace(/\(.+\)/, '')
+							.trim()
+							.toLowerCase();
 
 						if (lastnameA > lastnameB) return 1;
 						else if (lastnameA < lastnameB) return -1;
@@ -216,7 +222,7 @@ export default class Sheets extends Component {
 	/**
 	 * Generate a sharing link that contains both spreadsheet urls
 	 * base64 encoded, e.g.
-	 * /homecoming-reports/#share={base64 encoded JSON with urls} 
+	 * /homecoming-reports/#share={base64 encoded JSON with urls}
 	 * @return {String} Sharing url
 	 */
 	getSharingLink = () => {
@@ -247,20 +253,26 @@ export default class Sheets extends Component {
 	// Note: `user` comes from the URL, courtesy of our router
 	render({}, state) {
 		const sheets = state.sheets;
-		const sharingLink = sheets.events.ready && sheets.registrations.ready
-			? this.getSharingLink()
-			: false;
+		const sharingLink =
+			sheets.events.ready && sheets.registrations.ready ? this.getSharingLink() : false;
 
 		return (
 			<div class={style.sheets}>
 				<h1>Google Spreadsheets</h1>
 				<p>
-					This app depends on data from 2 worksheets in a Google Spreadsheet. Open these sheets in your browser and copy the urls into the fields below:
+					This app depends on data from 2 worksheets in a Google Spreadsheet. Open these
+					sheets in your browser and copy the urls into the fields below:
 				</p>
 				<h2>Registrations</h2>
 				<p
 					class={style.sheets__status}
-					style={`color: ${!sheets.registrations.spreadsheetUrl ? 'black' : sheets.registrations.ready ? 'green' : 'red'}`}
+					style={`color: ${
+						!sheets.registrations.spreadsheetUrl
+							? 'black'
+							: sheets.registrations.ready
+								? 'green'
+								: 'red'
+					}`}
 				>
 					{sheets.registrations.status}
 				</p>
@@ -287,7 +299,13 @@ export default class Sheets extends Component {
 				<h2>Events</h2>
 				<p
 					class={style.sheets__status}
-					style={`color: ${!sheets.events.spreadsheetUrl ? 'black' : sheets.events.ready ? 'green' : 'red'}`}
+					style={`color: ${
+						!sheets.events.spreadsheetUrl
+							? 'black'
+							: sheets.events.ready
+								? 'green'
+								: 'red'
+					}`}
 				>
 					{sheets.events.status}
 				</p>
@@ -311,7 +329,7 @@ export default class Sheets extends Component {
 						Save
 					</button>
 				</form>
-				{sharingLink &&
+				{sharingLink && (
 					<div>
 						<br />
 						<h2>Sharing link</h2>
@@ -332,16 +350,15 @@ export default class Sheets extends Component {
 								Copy to Clipboard
 							</button>
 						</form>
-					</div>}
+					</div>
+				)}
 				<br />
 				<br />
 				<hr />
 				<small>
 					<em>
-						The Google Sheets icon is used courtesy of <a
-							href="https://icons8.com/web-app/30461/Google-Sheets"
-							target="_blank"
-						>
+						The Google Sheets icon is used courtesy of{' '}
+						<a href="https://icons8.com/web-app/30461/Google-Sheets" target="_blank">
 							Icons8
 						</a>
 					</em>
